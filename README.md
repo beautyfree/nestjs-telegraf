@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/robot-mafia/nestjs-telegraf/main/.github/logo.svg" />
 </p>
 
-# ![npm](https://img.shields.io/npm/dm/nestjs-telegraf) ![GitHub last commit](https://img.shields.io/github/last-commit/0x467/nestjs-telegraf) ![NPM](https://img.shields.io/npm/l/nestjs-telegraf)
+# ![npm](https://img.shields.io/npm/dm/nestjs-telegraf) ![GitHub last commit](https://img.shields.io/github/last-commit/beautyfree/nestjs-telegraf) ![NPM](https://img.shields.io/npm/l/nestjs-telegraf)
 
 NestJS Telegraf – powerful solution for creating Telegram bots.
 
@@ -27,7 +27,7 @@ This package uses the best of the NodeJS world under the hood. [Telegraf](https:
 ## Installation
 
 ```bash
-$ npm i nestjs-telegraf telegraf
+$ npm i @beautyfree/nestjs-telegraf telegraf
 ```
 
 ## Documentation
