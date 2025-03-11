@@ -5,7 +5,7 @@ import { MetadataScanner } from '@nestjs/core/metadata-scanner';
 import { Module } from '@nestjs/core/injector/module';
 import { ParamMetadata } from '@nestjs/core/helpers/interfaces';
 import { ExternalContextCreator } from '@nestjs/core/helpers/external-context-creator';
-import { Composer, Context, Scenes, Telegraf } from 'telegraf';
+import { Composer, Context, MiddlewareFn, Scenes, Telegraf } from 'telegraf';
 
 import { MetadataAccessorService } from './metadata-accessor.service';
 import {
@@ -75,13 +75,13 @@ export class ListenersExplorerService
   }
 
   private registerComposers(modules: Module[]): void {
-    const updates = this.flatMap<InstanceWrapper>(modules, (instance) =>
+    const composers = this.flatMap<InstanceWrapper>(modules, (instance) =>
       this.filterComposers(instance),
     );
-    updates.forEach((wrapper) => {
+    composers.forEach((wrapper) => {
       const composer = new Composer();
       this.registerListeners(composer, wrapper);
-      this.stage.use(composer);
+      this.stage.use(this.registerPredicates(composer, wrapper));
     });
   }
 
@@ -89,7 +89,9 @@ export class ListenersExplorerService
     const updates = this.flatMap<InstanceWrapper>(modules, (instance) =>
       this.filterUpdates(instance),
     );
-    updates.forEach((wrapper) => this.registerListeners(this.bot, wrapper));
+    updates.forEach((wrapper) => {
+      this.registerListeners(this.bot, wrapper);
+    });
   }
 
   private registerScenes(modules: Module[]): void {
@@ -148,6 +150,22 @@ export class ListenersExplorerService
     if (!isScene) return undefined;
 
     return wrapper;
+  }
+
+  private registerPredicates(
+    composer: Composer<any>,
+    wrapper: InstanceWrapper<Record<string, unknown>>,
+  ): MiddlewareFn<any> {
+    const metadata = this.metadataAccessor.getPredicateMetadata(
+      wrapper.metatype,
+    );
+    if (!metadata) return composer.middleware();
+
+    if (metadata.type === 'filter') {
+      return Composer.branch(metadata.predicate, composer, Composer.passThru());
+    } else if (metadata.type === 'drop') {
+      return Composer.branch(metadata.predicate, Composer.passThru(), composer);
+    }
   }
 
   private registerListeners(

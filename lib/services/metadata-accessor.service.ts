@@ -6,12 +6,14 @@ import {
   UPDATE_METADATA,
   WIZARD_STEP_METADATA,
   COMPOSER_METADATA,
+  PREDICATE_METADATA,
 } from '../telegraf.constants';
 import {
   ListenerMetadata,
   SceneMetadata,
   WizardStepMetadata,
 } from '../interfaces';
+import { PredicateMetadata } from '../types';
 
 @Injectable()
 export class MetadataAccessorService {
@@ -30,6 +32,10 @@ export class MetadataAccessorService {
   isScene(target: Function): boolean {
     if (!target) return false;
     return !!this.reflector.get(SCENE_METADATA, target);
+  }
+
+  getPredicateMetadata(target: Function): PredicateMetadata | undefined {
+    return this.reflector.get(PREDICATE_METADATA, target);
   }
 
   getListenerMetadata(target: Function): ListenerMetadata[] | undefined {
